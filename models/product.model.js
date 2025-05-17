@@ -3,10 +3,10 @@ const db = require("../config/db");
 // Tạo mới 1 product
 async function createProduct(product) {
   try {
-    const { name, ProductCategory_Id, ReviewArticle} = product;
+    const { name, ProductCategory_Id, description} = product;
     const [result] = await db.execute(
-      "INSERT INTO product (name, ProductCategory_Id, ReviewArticle) VALUES (?, ?, ?)",
-      [name, ProductCategory_Id, ReviewArticle]
+      "INSERT INTO product (name, ProductCategory_Id, description) VALUES (?, ?, ?)",
+      [name, ProductCategory_Id, description]
     );
     return result.insertId;
   } catch (error) {
@@ -40,10 +40,10 @@ async function getProductById(id) {
 // Cập nhật product theo id
 async function updateProduct(id, product) {
   try {
-    const { name, ProductCategory_Id, ReviewArticle, isActive } = product;
+    const { name, ProductCategory_Id, description, isActive } = product;
     const [result] = await db.execute(
-      "UPDATE product SET name = ?, ProductCategory_Id = ?, ReviewArticle = ?, isActive = ? WHERE id = ?",
-      [name, ProductCategory_Id, ReviewArticle, isActive, id]
+      "UPDATE product SET name = ?, ProductCategory_Id = ?, description = ?, isActive = ? WHERE id = ?",
+      [name, ProductCategory_Id, description, isActive, id]
     );
     return result.affectedRows > 0;
   } catch (error) {
