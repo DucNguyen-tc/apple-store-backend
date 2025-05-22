@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors"); // Thêm dòng này
 require("dotenv").config(); // Load environment variables
 const productCategoryRoute = require("./routes/productCategory.route");
 const productRoute = require("./routes/product.route");
@@ -15,6 +16,14 @@ const errorHandler = require("./middleware/errorHandler"); // Import error handl
 
 const app = express();
 const port = process.env.PORT || 3000; // Default to port 3000 if not specified
+
+// Thêm cấu hình CORS cho phép frontend truy cập
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 
 // Middleware xử lý dữ liệu
 app.use(express.json()); // Parse JSON body

@@ -3,10 +3,10 @@ const db = require('../config/db');
 // Tạo mới 1 user
 async function createUser(user) {
     try {
-    const { fullName, email, password, phone, role } = user;
+    const { fullName, email, password, phone} = user;
     const [result] = await db.execute(
-        'INSERT INTO user (fullName, email, password, phone, role) VALUES (?, ?, ?, ?, ?)',
-        [fullName, email, password, phone, role]
+        'INSERT INTO user (fullName, email, password, phone) VALUES (?, ?, ?, ?)',
+        [fullName, email, password, phone]
     );
     return result.insertId;
     }
@@ -41,10 +41,10 @@ async function getUserById(id) {
 // Cập nhật user theo id
 async function updateUser(id, user) {
     try {
-        const { fullName, email, password, phone, role } = user;
+        const { fullName, email, password, phone} = user;
         const [result] = await db.execute(
-            'UPDATE user SET fullName = ?, email = ?, password = ?, phone = ?, role = ? WHERE id = ?',
-            [fullName, email, password, phone, role, id]
+            'UPDATE user SET fullName = ?, email = ?, password = ?, phone = ? WHERE id = ?',
+            [fullName, email, password, phone, id]
         );
         return result.affectedRows > 0;
     } catch (error) {

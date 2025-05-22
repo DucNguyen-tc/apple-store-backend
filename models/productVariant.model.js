@@ -10,9 +10,11 @@ async function createProductVariant(productVariant) {
       stock_quantity,
       price,
       specification,
+      name,
+      size
     } = productVariant;
     const [result] = await db.execute(
-      "INSERT INTO product_variant (product_id, color, storage_capacity, stock_quantity, price, specification) VALUES (?, ?, ?, ?, ?, ?)",
+      "INSERT INTO product_variant (product_id, color, storage_capacity, stock_quantity, price, specification, name, size) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
       [
         product_id,
         color,
@@ -20,6 +22,8 @@ async function createProductVariant(productVariant) {
         stock_quantity,
         price,
         specification,
+        name,
+        size
       ]
     );
     return result.insertId;
@@ -81,9 +85,11 @@ async function updateProductVariant(id, productVariant) {
       stock_quantity,
       price,
       specification,
+      name,
+      size
     } = productVariant;
     const [result] = await db.execute(
-      "UPDATE product_variant SET product_id = ?, color = ?, storage_capacity = ?, specification = ?, stock_quantity = ?, price = ? WHERE id = ?",
+      "UPDATE product_variant SET product_id = ?, color = ?, storage_capacity = ?, specification = ?, stock_quantity = ?, price = ?, name = ?, size = ? WHERE id = ?",
       [
         product_id,
         color,
@@ -92,6 +98,8 @@ async function updateProductVariant(id, productVariant) {
         stock_quantity,
         price,
         id,
+        name,
+        size
       ]
     );
     return result.affectedRows > 0;

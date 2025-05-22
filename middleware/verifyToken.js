@@ -17,7 +17,7 @@ function verifyToken(req, res, next) {
         next(); // Gọi middleware tiếp theo
     }
     catch (error) {
-        return res.status(403).json({ message: 'Token không hợp lệ hoặc đã hết hạn' });
+        return res.status(401).json({ message: 'Token không hợp lệ hoặc đã hết hạn' });
     }
 }
 

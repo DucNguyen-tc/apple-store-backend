@@ -1,11 +1,11 @@
 const db = require('../config/db');
 const { hashPassword, comparePassword } = require('../utils/hashPassword');
-const generateToken = require('../utils/generateToken');
+const { generateAccessToken, generateRefreshToken } = require('../utils/generateToken');
 const User = require('../models/user.model'); // Import model User
 
 //===== Đăng ký =====//
 const register = async (req, res) => {
-    const { fullName, email, password, phone, role } = req.body;
+    const { fullName, email, password, phone} = req.body;
 
     if (!fullName || !email || !password || !phone) {
         return res.status(400).json({ message: 'Vui lòng điền đầy đủ thông tin' });
@@ -22,8 +22,8 @@ const register = async (req, res) => {
 
 
         await db.execute(
-            'INSERT INTO user (fullName, email, password, phone, role) VALUES (?, ?, ?, ?, ?)',
-            [fullName, email, hashedPassword, phone, role]
+            'INSERT INTO user (fullName, email, password, phone) VALUES (?, ?, ?, ?)',
+            [fullName, email, hashedPassword, phone]
         );
         return res.status(201).json({ message: 'Đăng ký thành công' });
     }
@@ -42,26 +42,27 @@ const login = async (req, res) => {
 
     try {
         const [rows] = await db.execute('SELECT * FROM user WHERE email = ?', [email]);
-        const user = rows[0];
+        const result = rows[0];
 
-        if (!user) {
+        if (!result) {
             return res.status(401).json({ message: 'Email hoặc mật khẩu không đúng' });
         }
 
-        const isMatch = await comparePassword(password, user.password);
+        const isMatch = await comparePassword(password, result.password);
         if (!isMatch) {
             return res.status(401).json({ message: 'Email hoặc mật khẩu không đúng' });
         }
 
-        const payload = {
-            id: user.id,
-            fullName: user.fullName,
-            email: user.email,
-            role: user.role
+        const user = {
+            id: result.id,
+            fullName: result.fullName,
+            email: result.email,
+            role: result.role
         };
-        const accessToken = generateToken(payload);
+        const accessToken = generateAccessToken(user);
+        const refreshToken = generateRefreshToken(user);
 
-        res.json({ message: 'Đăng nhập thành công', accessToken });     
+        res.json({ message: 'Đăng nhập thành công', accessToken, refreshToken, user });     
     }
     catch (error) {
         console.error('Lỗi đăng nhập:', error);

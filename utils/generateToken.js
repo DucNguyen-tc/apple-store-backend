@@ -6,4 +6,13 @@ function generateAccessToken(payload) {
     return jwt.sign(payload, jwtConfig.secret, { expiresIn: jwtConfig.expiresIn });
 }
 
-module.exports = generateAccessToken;
+//Tạo mã thông báo làm mới (refresh token)
+function generateRefreshToken(payload) {
+    return jwt.sign(payload, jwtConfig.refreshSecret, { expiresIn: jwtConfig.refreshExpiresIn });
+}
+
+module.exports = 
+{
+    generateAccessToken,
+    generateRefreshToken
+};
