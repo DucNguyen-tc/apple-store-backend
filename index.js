@@ -12,6 +12,9 @@ const cartItemRoute = require("./routes/cartItem.route"); // Import cart item ro
 const productVariantImageRoute = require("./routes/productVariantImage.route"); // Import product variant image routes
 const orderRoute = require("./routes/order.route"); // Import order routes
 const orderItemRoute = require("./routes/orderItem.route"); // Import order item routes
+const articleRoute = require("./routes/article.route"); // Import article routes
+const storeRoute = require("./routes/store.route"); // Import store routes
+const warrantyClaimRoute = require("./routes/warrantyClaim.route"); // Import warranty claim routes
 const errorHandler = require("./middleware/errorHandler"); // Import error handler middleware
 
 const app = express();
@@ -44,6 +47,9 @@ app.use("/api/cart-items", cartItemRoute); // Cart item routes
 app.use("/api/product-variant-images", productVariantImageRoute); // Product variant image routes
 app.use("/api/orders", orderRoute); // Order routes
 app.use("/api/order-items", orderItemRoute); // Order item routes
+app.use("/api/articles", articleRoute); // Article routes
+app.use("/api/stores", storeRoute); // Store routes
+app.use("/api/warranty-claims", warrantyClaimRoute); // Warranty claim routes
 
 // Error handling middleware
 app.use(errorHandler); // Handle errors
