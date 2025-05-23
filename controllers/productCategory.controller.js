@@ -4,6 +4,19 @@ const ProductCategory = require("../models/productCategory.model");
 //Tạo mới danh mục sản phẩm
 exports.createProductCategory = async (req, res, next) => {
   try {
+    const {name} = req.body;
+    // Tên danh mục không được bỏ trống
+    if (!name || name.trim() === "") {
+      return res.status(400).json({ message: "Tên danh mục không được bỏ trống" });
+    }
+
+    // Kiểm tra xem danh mục đã tồn tại chưa
+    const existedCategory = await ProductCategory.getAllProductCategories();
+    if (existedCategory.some((category) => category.name === name)) {
+      return res.status(400).json({ message: "Tên danh mục đã tồn tại" });
+    }
+
+    // Nếu phù hợp 2 tiêu chí trên thì tạo mới danh mục
     const id = await ProductCategory.createProductCategory(req.body);
     res.status(201).json({
       message: "Product category created successfully",
@@ -42,6 +55,18 @@ exports.getProductCategoryById = async (req, res, next) => {
 //Cập nhật danh mục sản phẩm theo id
 exports.updateProductCategory = async (req, res, next) => {
   try {
+    const {name} = req.body;
+    // Tên danh mục không được bỏ trống
+    if (!name || name.trim() === "") {
+      return res.status(400).json({ message: "Tên danh mục không được bỏ trống" });
+    }
+
+    // Kiểm tra xem danh mục đã tồn tại chưa
+    const existedCategory = await ProductCategory.getAllProductCategories();
+    if (existedCategory.some((category) => category.name === name && category.id != req.params.id)) {
+      return res.status(400).json({ message: "Tên danh mục đã tồn tại" });
+    }
+    // Nếu phù hợp 2 tiêu chí trên thì cập nhật danh mục
     const updated = await ProductCategory.updateProductCategory(
       req.params.id,
       req.body

@@ -3,10 +3,10 @@ const db = require('../config/db');
 // Tạo mới 1 promotion
 async function createPromotion(promotion) {
     try {
-        const { name, discount_percent, start_date, end_date, description} = promotion;
+        const { name, discount_value, start_date, end_date, description, type} = promotion;
         const [result] = await db.execute(
-            "INSERT INTO promotion (name, discount_percent, start_date, end_date, description) VALUES (?, ?, ?, ?, ?)",
-            [name, discount_percent, start_date, end_date, description]
+            "INSERT INTO promotion (name, discount_value, start_date, end_date, description, type) VALUES (?, ?, ?, ?, ?, ?)",
+            [name, discount_value, start_date, end_date, description, type]
         );
         return result.insertId;
     }
@@ -43,10 +43,10 @@ async function getPromotionById(id) {
 // Cập nhật promotion theo id
 async function updatePromotion(id, promotion) {
     try {
-        const { name, discount_percent, start_date, end_date, isActive, description } = promotion;
+        const { name, discount_value, start_date, end_date, isActive, description, type } = promotion;
         const [result] = await db.execute(
-            "UPDATE promotion SET name = ?, discount_percent = ?, start_date = ?, end_date = ?, isActive = ?, description = ? WHERE id = ?",
-            [name, discount_percent, start_date, end_date, isActive, description, id]
+            "UPDATE promotion SET name = ?, discount_value = ?, start_date = ?, end_date = ?, isActive = ?, description = ?, type = ? WHERE id = ?",
+            [name, discount_value, start_date, end_date, isActive, description, type, id]
         );
         return result.affectedRows > 0;
     }
