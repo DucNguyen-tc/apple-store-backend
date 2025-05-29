@@ -1,8 +1,36 @@
 const Product = require("../models/product.model");
+const { getProductCategoryById } = require("../models/productCategory.model");
 
 // Tạo mới sản phẩm
 exports.createProduct = async (req, res, next) => {
   try {
+    // Kiểm tra dữ liệu đầu vào
+    const { Name, ProductCategory_Id } = req.body;
+
+    if (!Name || !ProductCategory_Id) {
+      return res
+        .status(400)
+        .json({ message: "Name and ProductCategory_Id are required" });
+    }
+
+    if ((await getProductCategoryById(ProductCategory_Id)) === undefined) {
+      return res
+        .status(400)
+        .json({ message: "ProductCategory_Id does not exist" });
+    }
+
+    // Kiểm tra trùng tên trong cùng 1 danh mục
+    const allProducts = await Product.getAllProducts();
+    if (
+      allProducts.some(
+        (p) => p.Name === Name && p.ProductCategory_Id === ProductCategory_Id
+      )
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Product name already exists in this category" });
+    }
+
     const id = await Product.createProduct(req.body);
     res.status(201).json({
       message: "Product created successfully",
@@ -39,6 +67,37 @@ exports.getProductById = async (req, res, next) => {
 // Cập nhật sản phẩm theo id
 exports.updateProduct = async (req, res, next) => {
   try {
+    const { Name, ProductCategory_Id } = req.body;
+
+    // Nếu bạn muốn bắt buộc phải có cả Name và ProductCategory_Id khi update:
+    if (!Name || !ProductCategory_Id) {
+      return res
+        .status(400)
+        .json({ message: "Name and ProductCategory_Id are required" });
+    }
+
+    // Kiểm tra trùng tên trong cùng 1 danh mục (ngoại trừ chính nó)
+    const allProducts = await Product.getAllProducts();
+    if (
+      allProducts.some(
+        (p) =>
+          p.Name === Name &&
+          p.ProductCategory_Id === ProductCategory_Id &&
+          p.id !== Number(req.params.id)
+      )
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Product name already exists in this category" });
+    }
+
+    // Kiểm tra ProductCategory_Id có tồn tại không
+    if ((await getProductCategoryById(ProductCategory_Id)) === undefined) {
+      return res
+        .status(400)
+        .json({ message: "ProductCategory_Id does not exist" });
+    }
+
     const updated = await Product.updateProduct(req.params.id, req.body);
     if (!updated) {
       return res.status(404).json({ message: "Product not found" });

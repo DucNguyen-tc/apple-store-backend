@@ -1,72 +1,70 @@
 const db = require("../config/db");
 
-// Tạo mới một product variant image
-async function createProductVariantImage(productVariantImage) {
-  try {
-    const { productVariantId, imageUrl } = productVariantImage;
-    const [result] = await db.execute(
-      "INSERT INTO product_variant_image (productVariantId, imageUrl) VALUES (?, ?)",
-      [productVariantId, imageUrl]
-    );
-    return result.insertId;
-  } catch (error) {
-    console.error("Error creating product variant image:", error);
-    throw error;
-  }
+// Tạo mới ảnh
+async function createProductVariantImage({ productVariantId, imageUrl, isThumbnail = false }) {
+  const [result] = await db.execute(
+    "INSERT INTO product_variant_image (product_variant_id, image_url, is_thumbnail) VALUES (?, ?, ?)",
+    [productVariantId, imageUrl, isThumbnail]
+  );
+  return result.insertId;
 }
 
-// Lấy tất cả product variant images
+// Lấy tất cả ảnh
 async function getAllProductVariantImage() {
-  try {
-    const [result] = await db.execute("SELECT * FROM product_variant_image");
-    return result;
-  } catch (error) {
-    console.error("Error fetching all product variant images:", error);
-    throw error;
-  }
+  const [result] = await db.execute("SELECT * FROM product_variant_image");
+  return result;
 }
 
-// Lấy product variant image theo id
+// Lấy ảnh theo ID
 async function getProductVariantImageById(id) {
-  try {
-    const [result] = await db.execute(
-      "SELECT * FROM product_variant_image WHERE id = ?",
-      [id]
-    );
-    return result[0];
-  } catch (error) {
-    console.log("Error fetching product variant image:", error);
-    throw error;
-  }
+  const [result] = await db.execute(
+    "SELECT * FROM product_variant_image WHERE id = ?",
+    [id]
+  );
+  return result[0];
 }
 
-// Cập nhật product variant image theo id
-async function updateProductVariantImage(id, productVariantImage) {
-  try {
-    const { productVariantId, imageUrl } = productVariantImage;
-    const [result] = await db.execute(
-      "UPDATE product_variant_image SET productVariantId = ?, imageUrl = ? WHERE id = ?",
-      [productVariantId, imageUrl, id]
-    );
-    return result.affectedRows > 0;
-  } catch (error) {
-    console.error("Error updating product variant image:", error);
-    throw error;
-  }
+// Lấy ảnh theo productVariantId
+async function getImagesByVariantId(variantId) {
+  const [result] = await db.execute(
+    "SELECT * FROM product_variant_image WHERE product_variant_id = ?",
+    [variantId]
+  );
+  return result;
 }
 
-// Xóa product variant image theo id
+// Cập nhật ảnh
+async function updateProductVariantImage(id, { productVariantId, imageUrl, isThumbnail }) {
+  const [result] = await db.execute(
+    "UPDATE product_variant_image SET product_variant_id = ?, image_url = ?, is_thumbnail = ? WHERE id = ?",
+    [productVariantId, imageUrl, isThumbnail, id]
+  );
+  return result.affectedRows > 0;
+}
+
+// Xoá ảnh
 async function deleteProductVariantImage(id) {
-  try {
-    const [result] = await db.execute(
-      "DELETE FROM product_variant_image WHERE id = ?",
-      [id]
-    );
-    return result.affectedRows > 0;
-  } catch (error) {
-    console.error("Error deleting product variant image:", error);
-    throw error;
-  }
+  const [result] = await db.execute(
+    "DELETE FROM product_variant_image WHERE id = ?",
+    [id]
+  );
+  return result.affectedRows > 0;
+}
+
+// Reset tất cả ảnh về is_thumbnail = false
+async function unsetAllThumbnails(variantId) {
+  await db.execute(
+    "UPDATE product_variant_image SET is_thumbnail = FALSE WHERE product_variant_id = ?",
+    [variantId]
+  );
+}
+
+// Set 1 ảnh là thumbnail
+async function setThumbnail(id) {
+  await db.execute(
+    "UPDATE product_variant_image SET is_thumbnail = TRUE WHERE id = ?",
+    [id]
+  );
 }
 
 module.exports = {
@@ -75,4 +73,7 @@ module.exports = {
   getProductVariantImageById,
   updateProductVariantImage,
   deleteProductVariantImage,
+  getImagesByVariantId,
+  unsetAllThumbnails,
+  setThumbnail,
 };

@@ -1,28 +1,31 @@
 const storeModel = require('../models/store.model');
 
 // Tạo cửa hàng mới
-async function createStore(req, res) {
+async function createStore(req, res, next) {
     try {
         const store = req.body;
+        if (!store.name || !store.address) {
+            return res.status(400).json({ error: 'Name and address are required' });
+        }
         const id = await storeModel.createStore(store);
         res.status(201).json({ id });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        next(error);
     }
 }
 
 // Lấy tất cả cửa hàng
-async function getAllStores(req, res) {
+async function getAllStores(req, res, next) {
     try {
         const stores = await storeModel.getAllStores();
         res.json(stores);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        next(error);
     }
 }
 
 // Lấy cửa hàng theo id
-async function getStoreById(req, res) {
+async function getStoreById(req, res, next) {
     try {
         const { id } = req.params;
         const store = await storeModel.getStoreById(id);
@@ -31,27 +34,30 @@ async function getStoreById(req, res) {
         }
         res.json(store);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        next(error);
     }
 }
 
 // Cập nhật cửa hàng
-async function updateStore(req, res) {
+async function updateStore(req, res, next) {
     try {
         const { id } = req.params;
         const store = req.body;
+        if (!store.name || !store.address) {
+            return res.status(400).json({ error: 'Name and address are required' });
+        }
         const success = await storeModel.updateStore(id, store);
         if (!success) {
             return res.status(404).json({ error: 'Store not found' });
         }
         res.json({ message: 'Store updated successfully' });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        next(error);
     }
 }
 
 // Xóa cửa hàng
-async function deleteStore(req, res) {
+async function deleteStore(req, res, next) {
     try {
         const { id } = req.params;
         const success = await storeModel.deleteStore(id);
@@ -60,7 +66,7 @@ async function deleteStore(req, res) {
         }
         res.json({ message: 'Store deleted successfully' });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        next(error);
     }
 }
 
