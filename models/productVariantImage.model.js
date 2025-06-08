@@ -27,7 +27,7 @@ async function getProductVariantImageById(id) {
 // Lấy ảnh theo productVariantId
 async function getImagesByVariantId(variantId) {
   const [result] = await db.execute(
-    "SELECT * FROM product_variant_image WHERE product_variant_id = ?",
+    "SELECT * FROM product_variant_image WHERE productVariantId = ?",
     [variantId]
   );
   return result;

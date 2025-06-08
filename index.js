@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors"); // Thêm dòng này
 require("dotenv").config(); // Load environment variables
+const path = require("path");
 const productCategoryRoute = require("./routes/productCategory.route");
 const productRoute = require("./routes/product.route");
 const userRoute = require("./routes/user.route");
@@ -33,6 +34,8 @@ app.use(
 // Middleware xử lý dữ liệu
 app.use(express.json()); // Parse JSON body
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded body
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Routes
 app.get("/", (req, res) => {

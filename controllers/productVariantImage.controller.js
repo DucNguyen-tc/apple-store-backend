@@ -98,6 +98,7 @@ exports.deleteProductVariantImage = async (req, res, next) => {
   }
 };
 
+// Lấy ảnh theo variant id
 exports.getImagesByVariantId = async (req, res, next) => {
   try {
     const images = await ProductVariantImage.getImagesByVariantId(

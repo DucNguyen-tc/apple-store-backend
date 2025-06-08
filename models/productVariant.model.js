@@ -36,31 +36,55 @@ async function createProductVariant(productVariant) {
 //Lấy tất cả product variants
 async function getAllProductVariants() {
   const sql = `
-    SELECT
-      pv.*,
-      IFNULL(SUM(
-        CASE 
-            WHEN promo.type = 'percentage' THEN promo.discount_value / 100 * pv.price
-            WHEN promo.type = 'flat_discount' THEN promo.discount_value
-            ELSE 0
-        END
-      ), 0) AS total_discount,
-      ROUND(pv.price - IFNULL(SUM(
-          CASE 
-            WHEN promo.type = 'percentage' THEN promo.discount_value / 100 * pv.price
-            WHEN promo.type = 'flat_discount' THEN promo.discount_value
-            ELSE 0
-          END
-        ), 0)) AS final_price
-    FROM product_variant pv
-    LEFT JOIN product_promotion pp ON pv.id = pp.productVariantId
-    LEFT JOIN promotion promo ON promo.id = pp.promotionId
-    GROUP BY pv.id
+    SELECT pv.*, 
+       MAX(thumb.imageUrl) AS thumbnail_url, 
+       IFNULL(SUM(CASE 
+           WHEN promo.type = 'percentage' THEN promo.discount_value / 100 * pv.price 
+           WHEN promo.type = 'flat_discount' THEN promo.discount_value 
+           ELSE 0 
+       END), 0) AS total_discount, 
+       ROUND(pv.price - IFNULL(SUM(CASE 
+           WHEN promo.type = 'percentage' THEN promo.discount_value / 100 * pv.price 
+           WHEN promo.type = 'flat_discount' THEN promo.discount_value 
+           ELSE 0 
+       END), 0)) AS final_price 
+    FROM product_variant pv 
+    LEFT JOIN product_promotion pp ON pv.id = pp.productVariantId 
+    LEFT JOIN promotion promo ON promo.id = pp.promotionId 
+    LEFT JOIN product_variant_image thumb ON thumb.productVariantId = pv.id AND thumb.isThumbnail = TRUE 
+    GROUP BY pv.id 
     LIMIT 0, 1000;
-  `;
+      `;
   const [rows] = await db.execute(sql);
   return rows;
 }
+// async function getAllProductVariants() {
+//   const sql = `
+//     SELECT
+//       pv.*,
+//       IFNULL(SUM(
+//         CASE 
+//             WHEN promo.type = 'percentage' THEN promo.discount_value / 100 * pv.price
+//             WHEN promo.type = 'flat_discount' THEN promo.discount_value
+//             ELSE 0
+//         END
+//       ), 0) AS total_discount,
+//       ROUND(pv.price - IFNULL(SUM(
+//           CASE 
+//             WHEN promo.type = 'percentage' THEN promo.discount_value / 100 * pv.price
+//             WHEN promo.type = 'flat_discount' THEN promo.discount_value
+//             ELSE 0
+//           END
+//         ), 0)) AS final_price
+//     FROM product_variant pv
+//     LEFT JOIN product_promotion pp ON pv.id = pp.productVariantId
+//     LEFT JOIN promotion promo ON promo.id = pp.promotionId
+//     GROUP BY pv.id
+//     LIMIT 0, 1000;
+//   `;
+//   const [rows] = await db.execute(sql);
+//   return rows;
+// }
 
 //Lấy product variant theo id
 async function getProductVariantById(id) {
