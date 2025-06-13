@@ -1,4 +1,6 @@
 const ProductVariantImage = require("../models/productVariantImage.model");
+const fs = require("fs");
+const path = require("path");
 
 // Tạo mới productVariantImage với upload ảnh
 exports.createProductVariantImage = async (req, res) => {
@@ -82,21 +84,93 @@ exports.updateProductVariantImage = async (req, res, next) => {
 // Xóa product variant image theo id
 exports.deleteProductVariantImage = async (req, res, next) => {
   try {
-    const deleted = await ProductVariantImage.deleteProductVariantImage(
-      req.params.id
-    );
-    if (!deleted) {
-      return res
-        .status(404)
-        .json({ message: "Product variant image not found" });
+    console.log(req)
+    const image = await ProductVariantImage.getProductVariantImageById(req.params.id);
+    if (!image) {
+      return res.status(404).json({ message: "Ảnh không tồn tại" });
     }
-    res
-      .status(200)
-      .json({ message: "Product variant image deleted successfully" });
+
+    // Xoá DB
+    await ProductVariantImage.deleteProductVariantImage(req.params.id);
+
+    // Xoá file thật
+    const filename = image.imageUrl.split("/").pop();
+    const filePath = path.join(__dirname, "../uploads", filename);
+
+    fs.unlink(filePath, (err) => {
+      if (err) console.log("Không thể xoá file ảnh:", err);
+    });
+
+    res.status(200).json({ message: "Đã xoá ảnh và file thành công" });
   } catch (error) {
     next(error);
   }
 };
+
+// //Xoá theo variantID
+exports.deleteImageByVariantID = async (req, res, next) => {
+  try {
+    const images = await ProductVariantImage.getImagesByVariantId(req.params.id);
+    if (!images || images.length === 0) {
+      return res.status(404).json({ message: "Không có ảnh để xoá" });
+    }
+
+    // Xoá từng file ảnh
+    images.forEach((img) => {
+      const filename = img.imageUrl.split("/").pop();
+      const filePath = path.join(__dirname, "../uploads", filename);
+      fs.unlink(filePath, (err) => {
+        if (err) console.log("Không thể xoá file:", err);
+      });
+    });
+
+    // Xoá DB
+    await ProductVariantImage.deleteImageByVariantId(req.params.id);
+
+    res.status(200).json({ message: "Đã xoá ảnh và file thành công" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Xóa product variant image theo id
+// exports.deleteProductVariantImage = async (req, res, next) => {
+//   try {
+//     const deleted = await ProductVariantImage.deleteProductVariantImage(
+//       req.params.id
+//     );
+//     if (!deleted) {
+//       return res
+//         .status(404)
+//         .json({ message: "Product variant image not found" });
+//     }
+//     res
+//       .status(200)
+//       .json({ message: "Product variant image deleted successfully" });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+//Xoá 
+// exports.deleteImageByVariantID = async (req, res, next) => {
+//   try {
+//     const deleted = await ProductVariantImage.deleteImageByVariantId(
+//       req.params.id
+//     );
+//     if (!deleted) {
+//       return res
+//         .status(404)
+//         .json({ message: "Product variant image not found" });
+//     }
+//     res
+//       .status(200)
+//       .json({ message: "Product variant image deleted successfully" });
+//   } catch (error) {
+//     next(error);
+//   }
+// }
+
 
 // Lấy ảnh theo variant id
 exports.getImagesByVariantId = async (req, res, next) => {
@@ -112,9 +186,10 @@ exports.getImagesByVariantId = async (req, res, next) => {
 
 exports.setThumbnailImage = async (req, res, next) => {
   try {
-    const { id, variantId } = req.body;
-    await ProductVariantImage.unsetAllThumbnails(variantId);
-    await ProductVariantImage.setThumbnail(id);
+    console.log(req.body)
+    const { thumbnailUrl, VariantId } = req.body;
+    await ProductVariantImage.unsetAllThumbnails(VariantId);
+    await ProductVariantImage.setThumbnail(thumbnailUrl);
     res.status(200).json({ message: "Đã đặt ảnh làm ảnh đại diện." });
   } catch (error) {
     next(error);

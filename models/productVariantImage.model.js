@@ -51,19 +51,28 @@ async function deleteProductVariantImage(id) {
   return result.affectedRows > 0;
 }
 
+// Xoá ảnh theo variant_id
+async function deleteImageByVariantId(variant_id){
+  const [result] = await db.execute(
+    "DELETE FROM product_variant_image WHERE productVariantId = ?",
+    [variant_id]
+  );
+  return result.affectedRows > 0;
+}
+
 // Reset tất cả ảnh về is_thumbnail = false
 async function unsetAllThumbnails(variantId) {
   await db.execute(
-    "UPDATE product_variant_image SET is_thumbnail = FALSE WHERE product_variant_id = ?",
+    "UPDATE product_variant_image SET isThumbnail = FALSE WHERE productVariantId = ?",
     [variantId]
   );
 }
 
 // Set 1 ảnh là thumbnail
-async function setThumbnail(id) {
+async function setThumbnail(thumbnailUrl) {
   await db.execute(
-    "UPDATE product_variant_image SET is_thumbnail = TRUE WHERE id = ?",
-    [id]
+    "UPDATE product_variant_image SET isThumbnail = TRUE WHERE imageUrl = ?",
+    [thumbnailUrl]
   );
 }
 
@@ -76,4 +85,5 @@ module.exports = {
   getImagesByVariantId,
   unsetAllThumbnails,
   setThumbnail,
+  deleteImageByVariantId
 };

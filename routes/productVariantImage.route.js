@@ -65,10 +65,17 @@ router.put(
 );
 
 router.delete(
-  "/:id",
+  "/image/:id",
   verifyToken,
   isAdmin,
   productVariantImageController.deleteProductVariantImage
+);
+
+router.delete(
+  "/variant/:id",
+  verifyToken,
+  isAdmin,
+  productVariantImageController.deleteImageByVariantID
 );
 
 module.exports = router;
