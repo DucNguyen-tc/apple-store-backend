@@ -120,3 +120,16 @@ exports.deleteProduct = async (req, res, next) => {
     next(error);
   }
 };
+
+
+exports.getProductByCategoryID = async (req, res, next) => {
+  try {
+    const products = await Product.getProductsByCategoryId(req.params.id);
+    if (!products) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    res.status(200).json(products);
+  } catch (error) {
+    next(error);
+  }
+}

@@ -84,7 +84,6 @@ exports.updateProductVariantImage = async (req, res, next) => {
 // Xóa product variant image theo id
 exports.deleteProductVariantImage = async (req, res, next) => {
   try {
-    console.log(req)
     const image = await ProductVariantImage.getProductVariantImageById(req.params.id);
     if (!image) {
       return res.status(404).json({ message: "Ảnh không tồn tại" });
@@ -186,7 +185,6 @@ exports.getImagesByVariantId = async (req, res, next) => {
 
 exports.setThumbnailImage = async (req, res, next) => {
   try {
-    console.log(req.body)
     const { thumbnailUrl, VariantId } = req.body;
     await ProductVariantImage.unsetAllThumbnails(VariantId);
     await ProductVariantImage.setThumbnail(thumbnailUrl);
