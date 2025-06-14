@@ -6,6 +6,7 @@ const verifyToken = require("../middleware/verifyToken");
 
 router.get("/", ProductVariantController.getAllProductVariants);
 router.get("/:id", ProductVariantController.getProductVariantById);
+router.get("/product/:id", ProductVariantController.getProductVariantByProductId);
 
 // Tạo mới một product variant
 router.post("/", verifyToken, isAdmin, ProductVariantController.createProductVariant);
