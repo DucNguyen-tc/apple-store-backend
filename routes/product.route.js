@@ -12,5 +12,6 @@ router.delete('/:id', verifyToken, isAdmin, Product.deleteProduct);
 // Các route không cần quyền admin
 router.get('/', Product.getAllProducts);
 router.get('/:id', Product.getProductById);
+router.get('/category/:id', Product.getProductByCategoryID);
 
 module.exports = router;

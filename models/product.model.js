@@ -44,6 +44,12 @@ async function deleteProduct(id) {
   return result.affectedRows > 0;
 }
 
+// Lấy product theo category
+async function getProductsByCategoryId (categoryId) {
+  const [rows] = await db.execute("SELECT * FROM product WHERE ProductCategory_Id = ?", [categoryId]);
+  return rows;
+}
+
 module.exports = {
   createProduct,
   getAllProducts,
@@ -51,4 +57,5 @@ module.exports = {
   updateProduct,
   deleteProduct,
   getProductByName,
+  getProductsByCategoryId,
 };

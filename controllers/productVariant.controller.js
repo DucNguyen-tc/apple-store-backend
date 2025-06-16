@@ -27,6 +27,22 @@ exports.getProductVariantById = async (req, res, next) => {
   }
 };
 
+//Lấy product variant theo productID
+exports.getProductVariantByProductId = async (req, res, next) => {
+  try {
+    const productVariant = await ProductVariant.getProductVariantByProductId(
+      req.params.id
+    );
+    if (!productVariant) {
+      return res.status(404).json({ message: "Product variant not found" });
+    }
+    res.status(200).json(productVariant);
+  } catch (error) {
+    console.error("Error fetching product variant by ID:", error);
+    next(error);
+  }
+};
+
 // Tạo mới một product variant
 exports.createProductVariant = async (req, res, next) => {
   try {

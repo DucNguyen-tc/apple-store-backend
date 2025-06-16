@@ -20,7 +20,17 @@ async function createOrder(order) {
 // Lấy danh sách tất cả đơn hàng
 async function getAllOrders() {
   try {
-    const [rows] = await db.execute("SELECT * FROM orders");
+    const [rows] = await db.execute(`
+    SELECT 
+	    u.fullName AS user_name,
+        u.phone as phone_number,
+	    o.*
+    FROM 
+	    orders o
+    JOIN 
+	    user u ON o.user_id = u.id
+    ORDER BY 
+	    o.order_date DESC;`);
     return rows; // Return the list of orders
   } catch (error) {
     console.error("Error fetching orders:", error);
@@ -40,6 +50,7 @@ async function getOrderById(orderId) {
     throw error; // Rethrow the error to be handled by the calling function
   }
 }
+
 // Tạo đơn hàng từ cart ( khoa )
 async function createOrderFromCart(user_id) {
   try {
