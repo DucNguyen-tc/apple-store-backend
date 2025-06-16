@@ -3,6 +3,7 @@ const productPromotionModel = require("../models/productPromotion.model");
 // Tạo mới một product promotion
 async function createProductPromotion(req, res) {
   try {
+    console.log(req.body)
     const { productVariantId, promotionId } = req.body;
     const success = await productPromotionModel.createProductPromotion({
       productVariantId,
@@ -23,9 +24,18 @@ async function createProductPromotion(req, res) {
 // Lấy tất cả product promotions
 async function getAllProductPromotions(req, res) {
   try {
-    const productPromotions =
+    const rows =
       await productPromotionModel.getAllProductPromotions();
-    res.status(200).json(productPromotions);
+
+    const mapping = {};
+    for (const row of rows) {
+      const variantId = row.productVariantId;
+      const promoId = row.promotionId;
+      if (!mapping[variantId]) mapping[variantId] = [];
+      mapping[variantId].push(promoId);
+    }
+
+    res.json(mapping);
   } catch (error) {
     res.status(500).json({ error: "Error fetching product promotions" });
   }
@@ -34,10 +44,10 @@ async function getAllProductPromotions(req, res) {
 // Xóa product promotion
 async function deleteProductPromotion(req, res) {
   try {
-    const { product__variant_id, promotion_id } = req.body;
+    const { productVariantId, promotionId } = req.body;
     const success = await productPromotionModel.deleteProductPromotion({
-      product__variant_id,
-      promotion_id,
+      productVariantId,
+      promotionId,
     });
     if (success) {
       res

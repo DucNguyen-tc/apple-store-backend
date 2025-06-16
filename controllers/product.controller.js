@@ -83,7 +83,7 @@ exports.updateProduct = async (req, res, next) => {
         (p) =>
           p.Name === Name &&
           p.ProductCategory_Id === ProductCategory_Id &&
-          p.id !== Number(req.params.id)
+          p.Id !== Number(req.params.id)
       )
     ) {
       return res
