@@ -1,42 +1,66 @@
-const db = require('../config/db');
+const db = require("../config/db");
 
-//Tạo mới 1 cart item
-async function createCartItem(cartItem) {
-    try {
-        const { user_id, product_variant_id, quantity } = cartItem;
-        const [result] = await db.execute(
-            'INSERT INTO cart_item (user_id, product_variant_id, quantity) VALUES (?, ?, ?)',
-            [user_id, product_variant_id, quantity])
-         return result.insertId;   
-    } catch (error) {
-        console.error('Error creating cart item:', error);
-        throw error;       
-    }
+// Thêm hoặc tăng số lượng cart item
+async function createOrUpdateCartItem(cartItem) {
+  const { user_id, product_variant_id, quantity } = cartItem;
+  // Kiểm tra đã có sản phẩm này trong giỏ chưa
+  const [rows] = await db.execute(
+    "SELECT * FROM cart_item WHERE user_id = ? AND product_variant_id = ?",
+    [user_id, product_variant_id]
+  );
+  if (rows.length > 0) {
+    // Nếu đã có, tăng số lượng
+    await db.execute(
+      "UPDATE cart_item SET quantity = quantity + ? WHERE user_id = ? AND product_variant_id = ?",
+      [quantity, user_id, product_variant_id]
+    );
+    return rows[0].id;
+  } else {
+    // Nếu chưa có, thêm mới
+    const [result] = await db.execute(
+      "INSERT INTO cart_item (user_id, product_variant_id, quantity) VALUES (?, ?, ?)",
+      [user_id, product_variant_id, quantity]
+    );
+    return result.insertId;
+  }
 }
 
-//Lấy giỏ hàng theo user_id
+// Lấy giỏ hàng theo user_id
 async function getCartByUserId(user_id) {
   const [rows] = await db.execute(
-    `SELECT * FROM cart_items WHERE user_id = ?`,
+    "SELECT ci.*, pv.price FROM cart_item ci JOIN product_variant pv ON ci.product_variant_id = pv.id WHERE ci.user_id = ?",
     [user_id]
   );
   return rows;
 }
 
+// Cập nhật số lượng cart item theo id
+async function updateCartItemQuantity(id, quantity) {
+  const [result] = await db.execute(
+    "UPDATE cart_item SET quantity = ? WHERE id = ?",
+    [quantity, id]
+  );
+  return result.affectedRows > 0;
+}
 
-//Xóa cart item theo id
+// Xóa cart item theo id
 async function deleteCartItem(id) {
-    try {
-        const [result] = await db.execute('DELETE FROM cart_item WHERE id = ?', [id]);
-        return result.affectedRows > 0;
-    } catch (error) {
-        console.error('Error deleting cart item:', error);
-        throw error;
-    }
+  const [result] = await db.execute("DELETE FROM cart_item WHERE id = ?", [id]);
+  return result.affectedRows > 0;
+}
+
+// Xóa toàn bộ cart item của user
+async function deleteAllCartItemsByUser(user_id) {
+  const [result] = await db.execute("DELETE FROM cart_item WHERE user_id = ?", [
+    user_id,
+  ]);
+  return result.affectedRows > 0;
 }
 
 module.exports = {
-    createCartItem,
-    getCartByUserId,
-    deleteCartItem
+  createOrUpdateCartItem,
+  getCartByUserId,
+  updateCartItemQuantity,
+  deleteCartItem,
+  deleteAllCartItemsByUser,
 };
