@@ -5,7 +5,7 @@ async function createCartItem(cartItem) {
     try {
         const { user_id, product_variant_id, quantity } = cartItem;
         const [result] = await db.execute(
-            'INSERT INTO cart_item (user_id, product_variant_id, quantity) VALUES (?, ?, ?)',
+            'INSERT INTO cart_items (user_id, product_variant_id, quantity) VALUES (?, ?, ?)',
             [user_id, product_variant_id, quantity])
          return result.insertId;   
     } catch (error) {
@@ -27,7 +27,7 @@ async function getCartByUserId(user_id) {
 //Xóa cart item theo id
 async function deleteCartItem(id) {
     try {
-        const [result] = await db.execute('DELETE FROM cart_item WHERE id = ?', [id]);
+        const [result] = await db.execute('DELETE FROM cart_items WHERE id = ?', [id]);
         return result.affectedRows > 0;
     } catch (error) {
         console.error('Error deleting cart item:', error);
