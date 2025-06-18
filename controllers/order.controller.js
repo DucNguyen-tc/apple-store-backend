@@ -2,9 +2,10 @@ const {
   createOrder,
   getAllOrders,
   getOrderById,
+  createOrderFromCart,
 } = require("../models/order.model");
 
-// Tạo đơn hàng
+// Tạo đơn hàng  (tạm bỏ )
 async function createOrderController(req, res) {
   try {
     const order = req.body;
@@ -40,8 +41,19 @@ async function getOrderByIdController(req, res) {
   }
 }
 
+// Đặt hàng từ giỏ hàng
+async function createOrderFromCartController(req, res) {
+  try {
+    const user_id = req.body.user_id;
+    const order_id = await createOrderFromCart(user_id);
+    res.status(201).json({ message: "Đặt hàng thành công!", order_id });
+  } catch (error) {
+    res.status(400).json({ message: error.message || "Lỗi đặt hàng!" });
+  }
+}
 module.exports = {
   createOrderController,
   getAllOrdersController,
   getOrderByIdController,
+  createOrderFromCartController,
 };

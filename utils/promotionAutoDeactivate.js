@@ -3,7 +3,7 @@ const db = require("../config/db"); // Đường dẫn tới kết nối DB
 const dayjs = require("dayjs");
 
 cron.schedule("0 0 * * *", async () => {
-  console.log("⏰ Kiểm tra mã giảm giá hết hạn...");
+  console.log(" Kiểm tra mã giảm giá hết hạn...");
   const now = dayjs().format("YYYY-MM-DD HH:mm:ss");
 
   const [expiredPromos] = await db.execute(
@@ -17,8 +17,8 @@ cron.schedule("0 0 * * *", async () => {
       `UPDATE promotion SET isActive = 0 WHERE id IN (${ids.map(() => "?").join(",")})`,
       ids
     );
-    console.log(`✅ Đã tắt ${ids.length} mã giảm giá`);
+    console.log(` Đã tắt ${ids.length} mã giảm giá`);
   } else {
-    console.log("✅ Không có mã nào hết hạn.");
+    console.log(" Không có mã nào hết hạn.");
   }
 });

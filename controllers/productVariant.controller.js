@@ -44,9 +44,39 @@ exports.getProductVariantByProductId = async (req, res, next) => {
 };
 
 // Tạo mới một product variant
+// exports.createProductVariant = async (req, res, next) => {
+//   try {
+//     const productVariant = req.body;
+//     const id = await ProductVariant.createProductVariant(productVariant);
+//     res.status(201).json({ id });
+//   } catch (error) {
+//     console.error("Error creating product variant:", error);
+//     next(error);
+//   }
+// };
+
+// Tạo mới một product variant
 exports.createProductVariant = async (req, res, next) => {
   try {
     const productVariant = req.body;
+    const { product_id, color, storage_capacity, size } = productVariant;
+
+    // Kiểm tra trùng biến thể
+    const existing = await ProductVariant.findDuplicateVariant({
+      product_id,
+      color,
+      storage_capacity,
+      size
+    });
+
+    console.log(existing)
+
+    if (existing) {
+      return res.status(400).json({
+        message: "Biến thể với màu, dung lượng và size này đã tồn tại.",
+      });
+    }
+
     const id = await ProductVariant.createProductVariant(productVariant);
     res.status(201).json({ id });
   } catch (error) {
@@ -54,6 +84,7 @@ exports.createProductVariant = async (req, res, next) => {
     next(error);
   }
 };
+
 
 // Cập nhật product variant theo id
 exports.updateProductVariant = async (req, res, next) => {

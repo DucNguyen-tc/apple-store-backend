@@ -41,10 +41,10 @@ async function getUserById(id) {
 // Cập nhật user theo id
 async function updateUser(id, user) {
     try {
-        const { fullName, email, phone, role} = user;
+        const { fullName, email, phone, role, isActive} = user;
         const [result] = await db.execute(
-            'UPDATE user SET fullName = ?, email = ?, phone = ?, role = ? WHERE id = ?',
-            [fullName, email, phone, role, id]
+            'UPDATE user SET fullName = ?, email = ?, phone = ?, role = ?, isActive = ? WHERE id = ?',
+            [fullName, email, phone, role, isActive, id]
         );
         return result.affectedRows > 0;
     } catch (error) {

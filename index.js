@@ -30,8 +30,6 @@ app.use(
   })
 );
 
-
-
 // Middleware xử lý dữ liệu
 app.use(express.json()); // Parse JSON body
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded body

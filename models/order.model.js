@@ -1,4 +1,5 @@
 const db = require("../config/db");
+const cartItemModel = require("../models/cartItem.model"); //khoa
 
 // Tạo đơn hàng
 async function createOrder(order) {
@@ -22,7 +23,7 @@ async function getAllOrders() {
     const [rows] = await db.execute(`
     SELECT 
 	    u.fullName AS user_name,
-        u.phone as phone_number,
+      u.phone as phone_number,
 	    o.*
     FROM 
 	    orders o
@@ -50,8 +51,53 @@ async function getOrderById(orderId) {
   }
 }
 
+// Tạo đơn hàng từ cart ( khoa )
+async function createOrderFromCart(user_id) {
+  try {
+    // Lấy giỏ hàng của user
+    const cartItems = await cartItemModel.getCartByUserId(user_id);
+    if (!cartItems || cartItems.length === 0) {
+      throw new Error("Giỏ hàng trống!");
+    }
+
+    // Tính tổng tiền
+    let total_amount = 0;
+    for (const item of cartItems) {
+      total_amount += item.quantity * item.price;
+    }
+
+    // Giá trị mặc định cho các trường bắt buộc
+    const shipping_address = "Chưa cập nhật";
+    const payment_method = "COD";
+
+    // Tạo đơn hàng mới
+    const [result] = await db.execute(
+      "INSERT INTO orders (user_id, status, total_amount, shipping_address, payment_method) VALUES (?, ?, ?, ?, ?)",
+      [user_id, "pending", total_amount, shipping_address, payment_method]
+    );
+    const order_id = result.insertId;
+
+    // Thêm các sản phẩm vào order_items
+    for (const item of cartItems) {
+      await db.execute(
+        "INSERT INTO order_items (order_id, product_variant_id, quantity, price_at_purchase) VALUES (?, ?, ?, ?)",
+        [order_id, item.product_variant_id, item.quantity, item.price]
+      );
+    }
+
+    // Xóa giỏ hàng sau khi đặt hàng thành công
+    await cartItemModel.deleteAllCartItemsByUser(user_id);
+
+    return order_id;
+  } catch (error) {
+    console.error("Error creating order from cart:", error);
+    throw error;
+  }
+}
+
 module.exports = {
   createOrder,
   getAllOrders,
   getOrderById,
+  createOrderFromCart,
 };
