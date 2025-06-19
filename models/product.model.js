@@ -30,10 +30,10 @@ async function getProductByName(name) {
 
 // Cập nhật product theo id
 async function updateProduct(id, product) {
-  const { Name, ProductCategory_Id, description, isActive } = product;
+  const { Name, ProductCategory_Id, description} = product;
   const [result] = await db.execute(
-    "UPDATE product SET Name = ?, ProductCategory_Id = ?, description = ?, isActive = ? WHERE id = ?",
-    [Name, ProductCategory_Id, description, isActive, id]
+    "UPDATE product SET Name = ?, ProductCategory_Id = ?, description = ? WHERE id = ?",
+    [Name, ProductCategory_Id, description, id]
   );
   return result.affectedRows > 0;
 }

@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors"); // Thêm dòng này
 require("dotenv").config(); // Load environment variables
+require("./utils/promotionAutoDeactivate");
 const path = require("path");
 const productCategoryRoute = require("./routes/productCategory.route");
 const productRoute = require("./routes/product.route");

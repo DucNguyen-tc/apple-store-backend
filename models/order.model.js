@@ -23,7 +23,7 @@ async function getAllOrders() {
     const [rows] = await db.execute(`
     SELECT 
 	    u.fullName AS user_name,
-        u.phone as phone_number,
+      u.phone as phone_number,
 	    o.*
     FROM 
 	    orders o
