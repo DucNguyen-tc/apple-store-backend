@@ -3,6 +3,8 @@ const {
   getAllOrders,
   getOrderById,
   createOrderFromCart,
+  getOrderByUserId,
+  updateOrderStatus,
 } = require("../models/order.model");
 
 // Tạo đơn hàng  (tạm bỏ )
@@ -51,9 +53,35 @@ async function createOrderFromCartController(req, res) {
     res.status(400).json({ message: error.message || "Lỗi đặt hàng!" });
   }
 }
+
+// Lấy đơn hàng theo user_id
+async function getOrderByUserIdController(req, res) {
+  try {
+    const user_id = req.params.user_id;
+    const orders = await getOrderByUserId(user_id);
+    res.status(200).json(orders);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch orders" });
+  }
+}
+
+// Cập nhật trạng thái đơn hàng
+async function updateOrderStatusController(req, res) {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    await updateOrderStatus(id, status);
+    res.status(200).json({ message: "Cập nhật trạng thái đơn hàng thành công!" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to update order status" });
+  }
+}
+
 module.exports = {
   createOrderController,
   getAllOrdersController,
   getOrderByIdController,
   createOrderFromCartController,
+  getOrderByUserIdController,
+  updateOrderStatusController,
 };

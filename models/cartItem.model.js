@@ -28,7 +28,35 @@ async function createOrUpdateCartItem(cartItem) {
 // Lấy giỏ hàng theo user_id
 async function getCartByUserId(user_id) {
   const [rows] = await db.execute(
-    "SELECT ci.*, pv.price FROM cart_item ci JOIN product_variant pv ON ci.product_variant_id = pv.id WHERE ci.user_id = ?",
+    `SELECT 
+    ci.*, 
+    pv.price, 
+    MAX(pvi.imageUrl) AS imageUrl, 
+    MAX(pv.name) AS variant_name,
+
+    ROUND(IFNULL(SUM(CASE 
+    WHEN promo.type = 'percentage' THEN promo.discount_value / 100 * pv.price
+    WHEN promo.type = 'flat_discount' THEN promo.discount_value
+    ELSE 0
+	END), 0)) AS total_discount,
+
+    ROUND(pv.price - IFNULL(SUM(CASE 
+        WHEN promo.type = 'percentage' THEN promo.discount_value / 100 * pv.price
+        WHEN promo.type = 'flat_discount' THEN promo.discount_value
+        ELSE 0
+    END), 0)) AS final_price
+
+FROM cart_item ci
+JOIN product_variant pv ON ci.product_variant_id = pv.id
+JOIN product_variant_image pvi ON pv.id = pvi.productVariantId AND pvi.isThumbnail = TRUE
+LEFT JOIN product_promotion pp ON pv.id = pp.productVariantId
+LEFT JOIN promotion promo ON promo.id = pp.promotionId
+    AND promo.isActive = TRUE
+    AND NOW() BETWEEN promo.start_date AND promo.end_date
+
+WHERE ci.user_id = ?
+GROUP BY ci.id
+LIMIT 0, 1000;`,
     [user_id]
   );
   return rows;

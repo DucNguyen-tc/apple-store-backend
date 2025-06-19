@@ -63,7 +63,7 @@ async function createOrderFromCart(user_id) {
     // Tính tổng tiền
     let total_amount = 0;
     for (const item of cartItems) {
-      total_amount += item.quantity * item.price;
+      total_amount += item.quantity * item.final_price; // Sử dụng giá cuối cùng đã tính toán
     }
 
     // Giá trị mặc định cho các trường bắt buộc
@@ -81,7 +81,7 @@ async function createOrderFromCart(user_id) {
     for (const item of cartItems) {
       await db.execute(
         "INSERT INTO order_items (order_id, product_variant_id, quantity, price_at_purchase) VALUES (?, ?, ?, ?)",
-        [order_id, item.product_variant_id, item.quantity, item.price]
+        [order_id, item.product_variant_id, item.quantity, item.final_price]
       );
     }
 
@@ -95,9 +95,32 @@ async function createOrderFromCart(user_id) {
   }
 }
 
+// Lấy đơn hàng theo user_id
+async function getOrderByUserId(user_id) {
+  try {
+    const [rows] = await db.execute("SELECT * FROM orders WHERE user_id = ?", [user_id]);
+    return rows;
+  } catch (error) {
+    console.error("Error fetching order by user_id:", error);
+    throw error;
+  }
+}
+
+// Cập nhật trạng thái đơn hàng
+async function updateOrderStatus(order_id, status) {
+  try {
+    await db.execute("UPDATE orders SET status = ? WHERE id = ?", [status, order_id]);
+  } catch (error) {
+    console.error("Error updating order status:", error);
+    throw error;
+  }
+}
+
 module.exports = {
   createOrder,
   getAllOrders,
   getOrderById,
   createOrderFromCart,
+  getOrderByUserId,
+  updateOrderStatus,
 };

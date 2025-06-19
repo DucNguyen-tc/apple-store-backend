@@ -1,6 +1,7 @@
 const {
   createOrderItem,
   getOrderItemsByOrderId,
+  getOrderItemsByUserId,
 } = require("../models/orderItem.model");
 
 // Thêm sản phẩm vào đơn hàng
@@ -25,7 +26,20 @@ async function getOrderItemsByOrderIdController(req, res) {
   }
 }
 
+// Lấy sản phẩm trong đơn hàng theo user_id
+async function getOrderItemsByUserIdController(req, res) {
+  try {
+    const { user_id, order_id } = req.params;
+    const orderItems = await getOrderItemsByUserId(user_id, order_id);
+    res.status(200).json(orderItems);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch order items" });
+  }
+};
+
+
 module.exports = {
   createOrderItemController,
   getOrderItemsByOrderIdController,
+  getOrderItemsByUserIdController,
 };

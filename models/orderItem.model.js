@@ -33,7 +33,24 @@ async function getOrderItemsByOrderId(orderId) {
   }
 }
 
+// Lấy sản phẩm trong đơn hàng theo user_id
+async function getOrderItemsByUserId(user_id, order_id) {
+  try {
+    const [rows] = await db.execute(`
+      SELECT oi.*,o.total_amount, pv.name as variant_name, pv.color, pv.storage_capacity
+      FROM order_items as oi
+      JOIN product_variant as pv on pv.id = oi.product_variant_id
+      JOIN orders as o on o.id = oi.order_id
+      WHERE o.user_id = ? AND oi.order_id = ?
+    `, [user_id, order_id]);
+    return rows;
+  } catch (error) {
+    console.error("Error fetching order items:", error);
+    throw error;
+  }
+};
 module.exports = {
   createOrderItem,
   getOrderItemsByOrderId,
+  getOrderItemsByUserId,
 };
